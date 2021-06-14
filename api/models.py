@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.db.models.fields.related import ForeignKey
 
 
 User = get_user_model()
@@ -47,8 +46,8 @@ class Choice(models.Model):
         Poll,
         on_delete=models.CASCADE,
         related_name='choices',
-        help_text = 'Выберите голосование',
-        verbose_name = 'Голос'
+        help_text='Выберите голосование',
+        verbose_name='Голос'
     )
     text = models.CharField(
         verbose_name='Вариант ответа',
@@ -65,14 +64,14 @@ class Vote(models.Model):
         on_delete=models.CASCADE,
         related_name='votes',
         help_text='Избиратель выбирается автоматически',
-        verbose_name = 'Избиратель'
+        verbose_name='Избиратель'
     )
     poll_id = models.ForeignKey(
         Poll,
         on_delete=models.CASCADE,
         related_name='votes',
-        help_text = 'Выберите голосование',
-        verbose_name = 'Голос'
+        help_text='Выберите голосование',
+        verbose_name='Голос'
     )
     choice_id = models.ForeignKey(
         Choice,
