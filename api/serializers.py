@@ -1,5 +1,3 @@
-from django.db import models
-from django.db.models import fields
 from rest_framework import serializers
 
 from .models import Poll, Vote
@@ -11,3 +9,7 @@ class PollSerializer(serializers.ModelSerializer):
         models = Poll
 
 
+class VoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('poll_id', 'choice_id')
+        models = Vote
