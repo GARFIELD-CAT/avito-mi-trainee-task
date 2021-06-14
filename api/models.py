@@ -47,7 +47,7 @@ class Choice(models.Model):
         on_delete=models.CASCADE,
         related_name='choices',
         help_text='Выберите голосование',
-        verbose_name='Голос'
+        verbose_name='Голосование'
     )
     text = models.CharField(
         verbose_name='Вариант ответа',
@@ -55,6 +55,9 @@ class Choice(models.Model):
         help_text='Заполните текст ответа',
         unique=True
     )
+
+    def __str__(self):
+        return self.text
 
 
 class Vote(models.Model):
@@ -71,7 +74,7 @@ class Vote(models.Model):
         on_delete=models.CASCADE,
         related_name='votes',
         help_text='Выберите голосование',
-        verbose_name='Голос'
+        verbose_name='Голосование'
     )
     choice_id = models.ForeignKey(
         Choice,
@@ -83,7 +86,7 @@ class Vote(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['voter', 'poll_id', 'choice_id'],
+                fields=['voter', 'poll_id'],
                 name='unique_vote'
             )
         ]
