@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db.models.fields.related import ForeignKey
 
 
 User = get_user_model()
@@ -40,6 +41,23 @@ class Poll(models.Model):
         return self.title
 
 
+class Choice(models.Model):
+    """Вариант ответа."""
+    poll_id = models.ForeignKey(
+        Poll,
+        on_delete=models.CASCADE,
+        related_name='choices',
+        help_text = 'Выберите голосование',
+        verbose_name = 'Голос'
+    )
+    text = models.CharField(
+        verbose_name='Вариант ответа',
+        max_length=255,
+        help_text='Заполните текст ответа',
+        unique=True
+    )
+
+
 class Vote(models.Model):
     """Голос избирателя."""
     voter = models.ForeignKey(
@@ -62,4 +80,3 @@ class Vote(models.Model):
         help_text='Выберите вариант ответа',
         verbose_name='Вариант ответа'
     )
-
