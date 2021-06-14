@@ -39,3 +39,27 @@ class Poll(models.Model):
     def __str__(self):
         return self.title
 
+
+class Vote(models.Model):
+    """Голос избирателя."""
+    voter = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='votes',
+        help_text='Избиратель выбирается автоматически',
+        verbose_name = 'Избиратель'
+    )
+    poll_id = models.ForeignKey(
+        Poll,
+        on_delete=models.CASCADE,
+        related_name='votes',
+        help_text = 'Выберите голосование',
+        verbose_name = 'Голос'
+    )
+    choice_id = models.ForeignKey(
+        Choice,
+        on_delete=models.CASCADE,
+        help_text='Выберите вариант ответа',
+        verbose_name='Вариант ответа'
+    )
+
