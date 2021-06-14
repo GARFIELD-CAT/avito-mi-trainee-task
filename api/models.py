@@ -79,3 +79,11 @@ class Vote(models.Model):
         help_text='Выберите вариант ответа',
         verbose_name='Вариант ответа'
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['voter', 'poll_id', 'choice_id'],
+                name='unique_vote'
+            )
+        ]
