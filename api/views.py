@@ -12,7 +12,7 @@ class APIPoll(APIView):
         # many = True?
         serializer = PollSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(creator=self.request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -22,6 +22,6 @@ class APIVote(APIView):
     def post(self, request):
         serializer = VoteSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(voter=self.request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
