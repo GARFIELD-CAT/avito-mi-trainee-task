@@ -1,12 +1,27 @@
 from rest_framework import serializers
 
-from .models import Poll, Vote
+from .models import Choice, Poll, Vote
 
+
+class CreateChoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('id', 'text')
+        model = Choice
 
 class PollSerializer(serializers.ModelSerializer):
+    choices = CreateChoiceSerializer(many=True)
+
     class Meta:
-        fields = ('pk', 'title', 'description', 'text')
+        fields = ('id', 'title', 'description', 'choices')
         model = Poll
+    
+    def create(self, validated_data):
+        choices = validated_data.pop('choices')
+        poll = Poll.objects.create(**validated_data)
+
+        for choice in choices:
+            Choice.objects.create(poll_id=poll, text=choice['text'])
+        return poll
 
 
 class VoteSerializer(serializers.ModelSerializer):
