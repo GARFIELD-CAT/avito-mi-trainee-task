@@ -79,6 +79,7 @@ class Vote(models.Model):
     choice_id = models.ForeignKey(
         Choice,
         on_delete=models.CASCADE,
+        related_name='votes',
         help_text='Выберите вариант ответа',
         verbose_name='Вариант ответа'
     )
