@@ -1,17 +1,15 @@
-from copy import error
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import Poll, Vote
-from .serializers import PollSerializer, VoteSerializer
+from .models import Poll
+from .serializers import GetResultSerializer, PollSerializer, VoteSerializer
 
 
 class APIPoll(APIView):
     """Создание голосования с вариантами ответов."""
     def post(self, request):
-        # many = True?
         serializer = PollSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(creator=self.request.user)
@@ -27,7 +25,10 @@ class APIVote(APIView):
             try:
                 serializer.save(voter=self.request.user)
             except Exception as error:
-                return Response({'message': f'Ошибка - {error}'})
+                return Response(
+                    {'message': f'Ошибка - {error}'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -36,8 +37,12 @@ class APIGetResult(APIView):
     """Получение результата по конкретному голосованию."""
     def post(self, request):
         poll_id = request.data['poll_id']
-        poll = get_object_or_404(Poll, id=poll_id)
-        poll_result = poll.votes
-        # many = True?
-        serializer = GetResultSerializer(poll_result)
+        try:
+            poll = get_object_or_404(Poll, id=poll_id)
+        except ValueError as error:
+            return Response(
+                {'message': f'Ошибка - {error}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer = GetResultSerializer(poll)
         return Response(serializer.data)
