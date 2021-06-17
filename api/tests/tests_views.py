@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework import status
@@ -34,9 +36,7 @@ class APIPollTests(APITestCase):
             'description': 'Мое тестовое описание голосования',
             'choices': [
                 {'text': 'Вариант_1'},
-                {'text': 'Вариант_2'},
-                {'text': 'Вариант_3'},
-                {'text': 'Вариант_4'}
+                {'text': 'Вариант_2'}
             ]
         }
 
@@ -52,10 +52,8 @@ class APIPollTests(APITestCase):
         self.assertEqual(
             Poll.objects.get().title, 'Тестовое голосование через API_Postgres'
         )
-        # Должно создаться 4 объекта Choice.
-        self.assertEqual(Choice.objects.count(), 4)
-        # Проверим, что один из объектов Choice создался c указанным text.
-        self.assertEqual(Choice.objects.get(id=4).text, 'Вариант_4')
+        # Должно создаться 2 объекта Choice.
+        self.assertEqual(Choice.objects.count(), 2)
 
     def test_not_create_poll_with_bad_data(self):
         """Убедитесь, что мы не можем создать некорректный объект poll."""
@@ -167,3 +165,89 @@ class APIVoteTests(APITestCase):
         self.assertEqual(
             response_bad_choices_id.status_code, status.HTTP_400_BAD_REQUEST
         )
+
+
+class APIGetResultTests(APITestCase):
+    def setUp(self):
+        """Подготовка прогона теста. Вызывается перед каждым тестом."""
+        # Создаем тестовых юзеров.
+        # Нам нужны два юзера, так как можно голосовать только 1 раз.
+        self.voter_1 = User.objects.create(
+            username='test_voter_1', password='Testvoterpass1'
+        )
+        self.voter_2 = User.objects.create(
+            username='test_voter_2', password='Testvoterpass2'
+        )
+        # Создадим еще юзера, который создаст голосование.
+        self.creator = User.objects.create(
+            username='test_creator', password='Testvoterpass2'
+        )
+        # Создаем тестовое голосование с вариантами ответов.
+        self.poll = Poll.objects.create(
+            title='Тестовое голосование_2', creator=self.creator)
+        self.choice_1 = Choice.objects.create(
+            poll_id=self.poll, text='Вариант_1'
+        )
+        self.choice_2 = Choice.objects.create(
+            poll_id=self.poll, text='Вариант_2'
+        )
+        # Создаем несколько голосов за разные варианты.
+        self.vote_1 = Vote.objects.create(
+            voter=self.voter_1,
+            poll_id=self.poll,
+            choice_id=self.choice_1
+        )
+        self.vote_2 = Vote.objects.create(
+            voter=self.voter_2,
+            poll_id=self.poll,
+            choice_id=self.choice_2
+        )
+        # Создаем токен для тестового юзера.
+        self.token = Token.objects.create(user=self.creator)
+        # Создаем тестовый api клиент.
+        self.token_client = APIClient()
+        # Авторизуем клиент с помощью токена.
+        self.token_client.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
+
+    def test_get_result_poll(self):
+        url = reverse('get-result-poll')
+        data = {
+            'poll_id': self.poll.id
+        }
+
+        # Отправляем POST запрос.
+        response = self.token_client.post(url, data, format='json')
+
+        # Проводим проверку ответа.
+        # Статус код должен быть равен 200.
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Проверяем поля ответа.
+        # Проверка названия голосования.
+        self.assertEqual(response.data['title'], 'Тестовое голосование_2')
+        # Проверка описания голосования.
+        self.assertEqual(response.data['description'], '')
+        # Проверка общего количества проголосовавших.
+        self.assertEqual(response.data['total_votes'], 2)
+        # Получаем информацию по ключу choice. Два варианта для голосования.
+        choice_1 = response.data['choices'][0]
+        choice_2 = response.data['choices'][1]
+        # Проверка, что 1 и 2 варинат для голосования имеют ожидаемый текст.
+        self.assertEqual(choice_1['text'], 'Вариант_1')
+        self.assertEqual(choice_2['text'], 'Вариант_2')
+        # Проверка, что 1 и 2 варинат для голосования
+        # имеют ожидаемое количество голосов.
+        self.assertEqual(choice_1['votes_count'], 1)
+        self.assertEqual(choice_2['votes_count'], 1)
+
+    def test_get_result_bad_poll_id(self):
+        url = reverse('get-result-poll')
+        data = {
+            'poll_id': '2'
+        }
+
+        # Отправляем POST запрос.
+        response = self.token_client.post(url, data, format='json')
+
+        # Проводим проверку ответа.
+        # Статус код должен быть равен 404.
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
