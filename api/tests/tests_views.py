@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework import status
@@ -238,16 +236,3 @@ class APIGetResultTests(APITestCase):
         # имеют ожидаемое количество голосов.
         self.assertEqual(choice_1['votes_count'], 1)
         self.assertEqual(choice_2['votes_count'], 1)
-
-    def test_get_result_bad_poll_id(self):
-        url = reverse('get-result-poll')
-        data = {
-            'poll_id': '2'
-        }
-
-        # Отправляем POST запрос.
-        response = self.token_client.post(url, data, format='json')
-
-        # Проводим проверку ответа.
-        # Статус код должен быть равен 404.
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
