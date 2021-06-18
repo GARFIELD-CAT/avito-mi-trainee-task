@@ -33,8 +33,7 @@ class APIPollTests(APITestCase):
             'title': 'Тестовое голосование через API_Postgres',
             'description': 'Мое тестовое описание голосования',
             'choices': [
-                {'text': 'Вариант_1'},
-                {'text': 'Вариант_2'}
+                {'text': 'Вариант_1'}
             ]
         }
 
@@ -50,8 +49,10 @@ class APIPollTests(APITestCase):
         self.assertEqual(
             Poll.objects.get().title, 'Тестовое голосование через API_Postgres'
         )
-        # Должно создаться 2 объекта Choice.
-        self.assertEqual(Choice.objects.count(), 2)
+        # Должен создаться 1 объект Choice.
+        self.assertEqual(Choice.objects.count(), 1)
+        # Должен создаться 1 объект Choice c указанным text.
+        self.assertEqual(Choice.objects.get().text, 'Вариант_1')
 
     def test_not_create_poll_with_bad_data(self):
         """Убедитесь, что мы не можем создать некорректный объект poll."""
