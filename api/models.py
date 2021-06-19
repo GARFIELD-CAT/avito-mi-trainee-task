@@ -35,7 +35,7 @@ class Poll(models.Model):
         help_text='Выберите активно ли голосование'
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.title
 
 
@@ -55,7 +55,7 @@ class Choice(models.Model):
         unique=True
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.text
 
 

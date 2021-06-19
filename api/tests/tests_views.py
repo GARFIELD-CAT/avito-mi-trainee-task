@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
 from rest_framework.test import APIClient, APITestCase
 
 from api.models import Choice, Poll, Vote
@@ -18,13 +19,13 @@ class APIPollTests(APITestCase):
             username='test_user', password='Testpass12'
         )
         # Создаем токен для тестового юзера.
-        self.token = Token.objects.create(user=self.user)
+        self.token: Token = Token.objects.create(user=self.user)
         # Создаем тестовый api клиент.
-        self.token_client = APIClient()
+        self.token_client: APIClient = APIClient()
         # Авторизуем клиент с помощью токена.
         self.token_client.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
 
-    def test_create_poll(self):
+    def test_create_poll(self) -> None:
         """
         Убедитесь, что мы можем создать новый объект poll с вариантами choice.
         """
@@ -38,7 +39,7 @@ class APIPollTests(APITestCase):
         }
 
         # Отправляем POST запрос.
-        response = self.token_client.post(url, data, format='json')
+        response: Response = self.token_client.post(url, data, format='json')
 
         # Проводим проверку ответа.
         # Статус код должен быть равен 201.
@@ -54,7 +55,7 @@ class APIPollTests(APITestCase):
         # Должен создаться 1 объект Choice c указанным text.
         self.assertEqual(Choice.objects.get().text, 'Вариант_1')
 
-    def test_not_create_poll_with_bad_data(self):
+    def test_not_create_poll_with_bad_data(self) -> None:
         """Убедитесь, что мы не можем создать некорректный объект poll."""
         url = reverse('create-poll')
         data_bad_title = {
@@ -71,10 +72,10 @@ class APIPollTests(APITestCase):
         }
 
         # Отправляем POST запрос.
-        response_bad_title = self.token_client.post(
+        response_bad_title: Response = self.token_client.post(
             url, data_bad_title, format='json'
         )
-        response_bad_choices = self.token_client.post(
+        response_bad_choices: Response = self.token_client.post(
             url, data_bad_choices, format='json'
         )
 
@@ -96,22 +97,22 @@ class APIVoteTests(APITestCase):
             username='test_user', password='Testpass12'
         )
         # Создаем токен для тестового юзера.
-        self.token = Token.objects.create(user=self.user)
+        self.token: Token = Token.objects.create(user=self.user)
         # Создаем тестовый api клиент.
-        self.token_client = APIClient()
+        self.token_client: APIClient = APIClient()
         # Авторизуем клиент с помощью токена.
         self.token_client.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
         # Создаем тестовое голосование с вариантами ответов.
-        self.poll = Poll.objects.create(
+        self.poll: Poll = Poll.objects.create(
             title='Тестовое голосование', creator=self.user)
-        self.choice_1 = Choice.objects.create(
+        self.choice_1: Choice = Choice.objects.create(
             poll_id=self.poll, text='Вариант_1'
         )
-        self.choice_2 = Choice.objects.create(
+        self.choice_2: Choice = Choice.objects.create(
             poll_id=self.poll, text='Вариант_2'
         )
 
-    def test_create_vote(self):
+    def test_create_vote(self) -> None:
         """Убедитесь, что мы можем создать новый объект vote."""
         url = reverse('poll')
         data = {
@@ -120,7 +121,7 @@ class APIVoteTests(APITestCase):
         }
 
         # Отправляем POST запрос.
-        response = self.token_client.post(url, data, format='json')
+        response: Response = self.token_client.post(url, data, format='json')
 
         # Проводим проверку ответа.
         # Статус код должен быть равен 201.
@@ -136,7 +137,7 @@ class APIVoteTests(APITestCase):
             Vote.objects.get().choice_id.text, 'Вариант_1'
         )
 
-    def test_not_create_vote_with_bad_data(self):
+    def test_not_create_vote_with_bad_data(self) -> None:
         """Убедитесь, что мы не можем создать некорректный объект vote."""
         url = reverse('poll')
         data_bad_poll_id = {
@@ -149,10 +150,10 @@ class APIVoteTests(APITestCase):
         }
 
         # Отправляем POST запрос.
-        response_bad_poll_id = self.token_client.post(
+        response_bad_poll_id: Response = self.token_client.post(
             url, data_bad_poll_id, format='json'
         )
-        response_bad_choices_id = self.token_client.post(
+        response_bad_choices_id: Response = self.token_client.post(
             url, data_bad_choice_id, format='json'
         )
 
@@ -182,40 +183,40 @@ class APIGetResultTests(APITestCase):
             username='test_creator', password='Testvoterpass2'
         )
         # Создаем тестовое голосование с вариантами ответов.
-        self.poll = Poll.objects.create(
+        self.poll: Poll = Poll.objects.create(
             title='Тестовое голосование_2', creator=self.creator)
-        self.choice_1 = Choice.objects.create(
+        self.choice_1: Choice = Choice.objects.create(
             poll_id=self.poll, text='Вариант_1'
         )
-        self.choice_2 = Choice.objects.create(
+        self.choice_2: Choice = Choice.objects.create(
             poll_id=self.poll, text='Вариант_2'
         )
         # Создаем несколько голосов за разные варианты.
-        self.vote_1 = Vote.objects.create(
+        self.vote_1: Vote = Vote.objects.create(
             voter=self.voter_1,
             poll_id=self.poll,
             choice_id=self.choice_1
         )
-        self.vote_2 = Vote.objects.create(
+        self.vote_2: Vote = Vote.objects.create(
             voter=self.voter_2,
             poll_id=self.poll,
             choice_id=self.choice_2
         )
         # Создаем токен для тестового юзера.
-        self.token = Token.objects.create(user=self.creator)
+        self.token: Token = Token.objects.create(user=self.creator)
         # Создаем тестовый api клиент.
-        self.token_client = APIClient()
+        self.token_client: APIClient = APIClient()
         # Авторизуем клиент с помощью токена.
         self.token_client.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
 
-    def test_get_result_poll(self):
+    def test_get_result_poll(self) -> None:
         url = reverse('get-result-poll')
         data = {
             'poll_id': self.poll.id
         }
 
         # Отправляем POST запрос.
-        response = self.token_client.post(url, data, format='json')
+        response: Response = self.token_client.post(url, data, format='json')
 
         # Проводим проверку ответа.
         # Статус код должен быть равен 200.
