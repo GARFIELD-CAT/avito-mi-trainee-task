@@ -1,40 +1,36 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import status
+from rest_framework import generics, status
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
-from .models import Poll
-from .serializers import GetResultSerializer, PollSerializer, VoteSerializer
+from .models import Poll, Vote
+from .serializers import GetResultSerializer, CreatePollSerializer
+from .serializers import CreateVoteSerializer
 
 
-class APIPoll(APIView):
+class PollCreateAPIView(generics.CreateAPIView):
     """Создание голосования с вариантами ответов."""
-    def post(self, request):
-        serializer = PollSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(creator=self.request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    queryset = Poll.objects.all()
+    serializer_class = CreatePollSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(creator=self.request.user)
 
 
-class APIVote(APIView):
+class VoteCreateAPIView(generics.CreateAPIView):
     """Голосование за конкретный вариант."""
-    def post(self, request):
-        serializer = VoteSerializer(data=request.data)
-        if serializer.is_valid():
-            try:
-                serializer.save(voter=self.request.user)
-            except Exception as error:
-                return Response(
-                    {'message': f'Ошибка - {error}'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    queryset = Vote.objects.all()
+    serializer_class = CreateVoteSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(voter=self.request.user)
 
 
-class APIGetResult(APIView):
+class GetResultAPIView(generics.GenericAPIView):
     """Получение результата по конкретному голосованию."""
+    serializer_class = GetResultSerializer
+    permission_classes = (AllowAny,)
+
     def post(self, request):
         poll_id = request.data['poll_id']
         try:
