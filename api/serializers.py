@@ -20,11 +20,11 @@ class CreatePollSerializer(serializers.ModelSerializer):
 
     # Переопределяем метод для создания нескольких вариантов ответа
     # в одном запросе.
-    def create(self, validated_data):
+    def create(self, validated_data) -> Poll:
         # Из словаря с валидными данными забираем все варианты ответов.
         choices = validated_data.pop('choices')
         # Создаем объект Poll из оставшихся в словаре данных.
-        poll = Poll.objects.create(**validated_data)
+        poll: Poll = Poll.objects.create(**validated_data)
 
         # Создаем объекты Choice.
         for choice in choices:
@@ -50,7 +50,7 @@ class GetChoiceSerializer(serializers.ModelSerializer):
         model = Choice
 
     # Метод помещяет в поле votes_count количество голосов для варианта ответа.
-    def get_votes_count(self, obj):
+    def get_votes_count(self, obj: Choice) -> int:
         return obj.votes.count()
 
 
@@ -70,5 +70,5 @@ class GetResultSerializer(serializers.ModelSerializer):
         read_only_fields = ('title', 'description')
 
     # Метод помещяет в поле total_votes количество голосов у голосования.
-    def get_total_votes(self, obj):
+    def get_total_votes(self, obj: Poll) -> int:
         return obj.votes.count()
