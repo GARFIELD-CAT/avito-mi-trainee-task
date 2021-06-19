@@ -9,7 +9,7 @@ class CreateChoiceSerializer(serializers.ModelSerializer):
         model = Choice
 
 
-class PollSerializer(serializers.ModelSerializer):
+class CreatePollSerializer(serializers.ModelSerializer):
     choices = CreateChoiceSerializer(many=True)
 
     class Meta:
@@ -25,13 +25,13 @@ class PollSerializer(serializers.ModelSerializer):
         return poll
 
 
-class VoteSerializer(serializers.ModelSerializer):
+class CreateVoteSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('poll_id', 'choice_id')
         model = Vote
 
 
-class ChoiceSerializer(serializers.ModelSerializer):
+class GetChoiceSerializer(serializers.ModelSerializer):
     votes_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -43,12 +43,16 @@ class ChoiceSerializer(serializers.ModelSerializer):
 
 
 class GetResultSerializer(serializers.ModelSerializer):
-    choices = ChoiceSerializer(read_only=True, many=True)
+    poll_id = serializers.PrimaryKeyRelatedField(
+        source='id', queryset=Poll.objects.all()
+    )
+    choices = GetChoiceSerializer(read_only=True, many=True)
     total_votes = serializers.SerializerMethodField()
 
     class Meta:
-        fields = ('id', 'title', 'description', 'total_votes', 'choices')
+        fields = ('poll_id', 'title', 'description', 'total_votes', 'choices')
         model = Poll
+        read_only_fields = ('title', 'description')
 
     def get_total_votes(self, obj):
         return obj.votes.count()
