@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
 from .models import Choice, Poll, Vote
 
@@ -34,9 +35,18 @@ class CreatePollSerializer(serializers.ModelSerializer):
 
 class CreateVoteSerializer(serializers.ModelSerializer):
     """Сериализатор для голосования за один вариант ответа."""
+    voter = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
     class Meta:
-        fields = ('poll_id', 'choice_id')
+        fields = ('poll_id', 'choice_id', 'voter')
         model = Vote
+        # Пользователь в каждом голосовании может участвовать только 1 раз.
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Vote.objects.all(),
+                fields=['poll_id', 'voter']
+            )
+        ]
 
 
 class GetChoiceSerializer(serializers.ModelSerializer):

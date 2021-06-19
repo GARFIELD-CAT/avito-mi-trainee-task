@@ -7,7 +7,6 @@ from rest_framework.test import APIClient, APITestCase
 
 from api.models import Choice, Poll, Vote
 
-
 User = get_user_model()
 
 
