@@ -1,3 +1,4 @@
+from typing import List
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
@@ -47,6 +48,30 @@ class CreateVoteSerializer(serializers.ModelSerializer):
                 fields=['poll_id', 'voter']
             )
         ]
+
+    def validate(self, data):
+        """Метод проверяет, чтобы голос был отдан только
+        за варианты ответов конкретного голосования.
+        """
+        # Id возможных вариантов ответа.
+        choices_id: List[int] = []
+        # Выбранное голосование.
+        poll: Poll = data['poll_id']
+        # Выбранный вариант ответа.
+        choice: Choice = data['choice_id']
+        # Выбираем все возможные варианты ответа выбранного голосования.
+        poll_choices = poll.choices.all()
+        # Если выбранного варианта ответа нет в вариантах нашего голосования,
+        # вызываем ошибку.
+        if choice not in poll_choices:
+            # Получаем id возможных вариантов ответа у голосования.
+            for elem in poll_choices:
+                choices_id.append(elem.id)
+            raise serializers.ValidationError(
+                f'Можно голосовать только за варианты ответов '
+                f'выбранного голосования. Id возможных вариантов: {choices_id}'
+            )
+        return data
 
 
 class GetChoiceSerializer(serializers.ModelSerializer):
