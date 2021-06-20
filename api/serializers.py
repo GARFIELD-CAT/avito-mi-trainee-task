@@ -45,7 +45,8 @@ class CreateVoteSerializer(serializers.ModelSerializer):
         validators = [
             UniqueTogetherValidator(
                 queryset=Vote.objects.all(),
-                fields=['poll_id', 'voter']
+                fields=['poll_id', 'voter'],
+                message='Нельзя проголосовать дважды в одном голосовании.'
             )
         ]
 
