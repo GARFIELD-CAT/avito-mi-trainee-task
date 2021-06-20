@@ -32,7 +32,6 @@ class VoteCreateAPIView(generics.CreateAPIView):
 class GetResultAPIView(generics.GenericAPIView):
     """Получение результата по конкретному голосованию."""
     serializer_class = GetResultSerializer
-    permission_classes = (AllowAny,)
 
     def post(self, request) -> Response:
         poll_id: int = request.data['poll_id']
