@@ -22,7 +22,7 @@ class APIUrlTests(APITestCase):
         )
         # Создаем тестовый api клиент без токена.
         self.client: APIClient = APIClient()
-
+        # Авторизуем тестовый api клиент без токена.
         self.client.login(
             username=self.user.username, password=self.user.password
         )
