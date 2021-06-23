@@ -23,11 +23,18 @@ REST API сервис для проведения голосований.
    * Заполнить данными поле ```DATABASES``` в файле settings.py для подключения к базе данных.  
    Записать в поля ```NAME - имя бд, USER - пользователь бд, PASSWORD - пароль пользователя бд, PORT - порт бд```
    * Создать миграции базы данных ```python manage.py makemigrations```
-   * Произвести мигрирование ```python manage.py migrate```
+   * Произвести миграции ```python manage.py migrate```
    * Если будут входить в админку Django, то нужно создать суперпользователя ```python manage.py createsuperuser```  
    Админка тут http://127.0.0.1:8000/admin/
    * Запуск проекта ```python manage.py runserver```
-2. Запуск через докер - не реализовано
+2. Запуск через докер  
+   * Сделать клонирование этого репозитория ```git clone <адрес репозитория>```
+   * Зайти в папку проекта под названием avito-mi-trainee-task
+   * Запустить контейнер ```docker-compose up```
+   * Создать миграции базы данных ```docker-compose run web python manage.py makemigrations```
+   * Произвести миграции ```docker-compose run web python manage.py migrate```
+   * Если будут входить в админку Django, то нужно создать суперпользователя ```docker-compose run web python manage.py createsuperuser```  
+   Админка тут http://127.0.0.1:8000/admin/ 
 ## Схема архитектуры  
 ![Схема](http://dl3.joxi.net/drive/2021/06/22/0037/2710/2452118/18/59fb5621b2.jpg)
 
