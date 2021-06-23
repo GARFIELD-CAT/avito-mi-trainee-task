@@ -33,6 +33,7 @@ REST API сервис для проведения голосований.
    * Запустить контейнер ```docker-compose up -d```
    * Создать миграции базы данных ```docker-compose run web python manage.py makemigrations```
    * Произвести миграции ```docker-compose run web python manage.py migrate```
+   * Зайти на адрес  http://127.0.0.1:8000/swagger/
    * Если будут входить в админку Django, то нужно создать суперпользователя ```docker-compose run web python manage.py createsuperuser```  
    Админка тут http://127.0.0.1:8000/admin/ 
 ## Схема архитектуры  
