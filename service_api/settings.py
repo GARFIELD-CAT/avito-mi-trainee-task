@@ -9,8 +9,8 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-
-from typing import List, Optional
+from os import environ
+from typing import List
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -21,12 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'i5=sohdoi^8)5$d7f*$#kvfj$gwdw=$^s-$i89t(wk_hd4nvi='
+SECRET_KEY = environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = int(environ.get('DEBUG', default=0))
 
-ALLOWED_HOSTS: List[Optional[str]] = []
+ALLOWED_HOSTS: List[str] = environ.get('ALLOWED_HOSTS').split(' ')
 
 
 # Application definition
@@ -81,12 +81,12 @@ WSGI_APPLICATION = 'service_api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'django_poll_db',
-        'USER': 'postgres',
-        'PASSWORD': 'PTN4hssmc',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'ENGINE': environ.get('POSTGRES_ENGINE'),
+        'NAME': environ.get('POSTGRES_DB'),
+        'USER': environ.get('POSTGRES_USER'),
+        'PASSWORD': environ.get('POSTGRES_PASSWORD'),
+        'HOST': environ.get('POSTGRES_HOST'),
+        'PORT': environ.get('POSTGRES_PORT'),
     }
 }
 
@@ -126,6 +126,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
+STATIC_ROOT = 'service_api.static'
 
 STATIC_URL = '/static/'
 
