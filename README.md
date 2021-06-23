@@ -30,7 +30,7 @@ REST API сервис для проведения голосований.
 2. Запуск через докер  
    * Сделать клонирование этого репозитория ```git clone <адрес репозитория>```
    * Зайти в папку проекта под названием avito-mi-trainee-task
-   * Запустить контейнер ```docker-compose up```
+   * Запустить контейнер ```docker-compose up -d```
    * Создать миграции базы данных ```docker-compose run web python manage.py makemigrations```
    * Произвести миграции ```docker-compose run web python manage.py migrate```
    * Если будут входить в админку Django, то нужно создать суперпользователя ```docker-compose run web python manage.py createsuperuser```  
