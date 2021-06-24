@@ -25,6 +25,7 @@ REST API сервис для проведения голосований.
    * Создать миграции базы данных ```python manage.py makemigrations```
    * Произвести миграции ```python manage.py migrate```
    * Если будут входить в админку Django, то нужно создать суперпользователя ```python manage.py createsuperuser```  
+   * Тестирование ```python manage.py test api/tests/```
    Админка тут http://127.0.0.1:8000/admin/
    * Запуск проекта ```python manage.py runserver```
 2. Запуск через докер  
@@ -34,7 +35,8 @@ REST API сервис для проведения голосований.
    * Создать миграции базы данных ```docker-compose run web python manage.py makemigrations```
    * Произвести миграции ```docker-compose run web python manage.py migrate```
    * Зайти на адрес  http://127.0.0.1:8000/swagger/
-   * Если будут входить в админку Django, то нужно создать суперпользователя ```docker-compose run web python manage.py createsuperuser```  
+   * Если будут входить в админку Django, то нужно создать суперпользователя ```docker-compose run web python manage.py createsuperuser```
+   * Тестирование через docker ```docker-compose run web python manage.py test api/tests/```
    Админка тут http://127.0.0.1:8000/admin/ 
 ## Схема архитектуры  
 ![Схема REST API](http://dl3.joxi.net/drive/2021/06/22/0037/2710/2452118/18/59fb5621b2.jpg)  
